@@ -1,14 +1,17 @@
 import { IDatabase } from '../../db/db'
+import { convertToMoney } from '../utils'
 
 export const coinPriceMap: { [key: string]: number } = {
-  Nickel: 1.2,
-  Dime: 1,
-  Quarter: 2,
-  Penny: 0.5,
+  Penny: 1,
+  Nickel: 5,
+  Dime: 10,
+  Quarter: 25,
 }
 
+const acceptedCoins = ['Nickel', 'Dime', 'Quarter']
+
 interface InsertCoinReturn {
-  total: number
+  total: string
 }
 
 interface ReturnCoinsReturn {
@@ -29,9 +32,9 @@ export class CoinService implements ICoinService {
   }
 
   public async insertCoin(coin: string) {
-    if (coin === 'Penny') {
+    if (!acceptedCoins.includes(coin)) {
       return {
-        total: this.db.vendingBank.total,
+        total: convertToMoney(this.db.vendingBank.total),
         coinReturn: coin,
       }
     }
@@ -40,15 +43,12 @@ export class CoinService implements ICoinService {
     this.db.vendingBank.total += coinPriceMap[coin]
 
     return {
-      total: this.db.vendingBank.total,
+      total: convertToMoney(this.db.vendingBank.total),
     }
   }
 
   public async returnCoins() {
-    this.db.vendingBank.insertedCoins.forEach((c) => {
-      this.db.vendingBank.total -= coinPriceMap[c]
-    })
-
+    this.db.vendingBank.total = 0
     const returnCoins = this.db.vendingBank.insertedCoins
     this.db.vendingBank.insertedCoins = []
 

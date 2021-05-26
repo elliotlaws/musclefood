@@ -1,15 +1,17 @@
 import { IProduct } from '../../db/data/products'
 import { IDatabase } from '../../db/db'
+import { convertToMoney } from '../utils'
+import { coinPriceMap } from './coin.service'
 
 interface SelectProductReturn {
   message: string
   dispensedProduct?: string
-  coinReturn?: number
+  coinReturn?: string
 }
 
 interface CheckStatusReturn {
   message: string
-  total: number
+  total: string
 }
 
 export interface IProductService {
@@ -34,7 +36,7 @@ export class ProductService implements IProductService {
     const message =
       this.db.vendingBank.total === 0 ? 'INSERT COIN' : 'CURRENT TOTAL'
 
-    return { message, total: this.db.vendingBank.total }
+    return { message, total: convertToMoney(this.db.vendingBank.total) }
   }
 
   public async selectProduct(productId: number) {
@@ -55,10 +57,13 @@ export class ProductService implements IProductService {
       }
 
       this.db.vendingBank.total > 0 &&
-        (result = { ...result, coinReturn: this.db.vendingBank.total })
+        (result = {
+          ...result,
+          coinReturn: convertToMoney(this.db.vendingBank.total),
+        })
     } else {
       result = {
-        message: `PRICE ${product.price}`,
+        message: `PRICE ${convertToMoney(product.price)}`,
       }
     }
 

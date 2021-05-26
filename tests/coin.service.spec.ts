@@ -3,6 +3,7 @@ import { IDatabase } from '../src/db/db'
 import { products } from '../src/db/data/products'
 import { CoinService } from '../src/api/services'
 import { coinPriceMap } from '../src/api/services/coin.service'
+import { convertToMoney } from '../src/api/utils'
 
 describe('Coin service tests', () => {
   let vendingBank: IVendingBank
@@ -11,7 +12,6 @@ describe('Coin service tests', () => {
   beforeEach(() => {
     vendingBank = {
       total: 0,
-      pending: 0,
       insertedCoins: [],
     }
 
@@ -25,7 +25,7 @@ describe('Coin service tests', () => {
     const result = await service.insertCoin(coin)
 
     expect(result).toEqual({
-      total: 0,
+      total: convertToMoney(0),
       coinReturn: coin,
     })
   })
@@ -38,7 +38,7 @@ describe('Coin service tests', () => {
     const result = await service.insertCoin(coin)
 
     expect(result).toEqual({
-      total: coinValue,
+      total: convertToMoney(coinValue),
     })
   })
 
